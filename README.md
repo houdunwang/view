@@ -91,3 +91,266 @@ View::with(['name'=>'后盾网','uri'=>'houdunwang.com'])->make();
 ```
 @{{$name}}
 ```
+
+
+#系统标签
+模板标签是使用预先定义好的tag快速读取数据。开发者也可以根据项目需要扩展标签库。
+
+[TOC]
+
+##运算符
+可以在属性中使用以下运算符：
+```
+eq		==
+neq		!=
+lt		<
+gt		>
+lte		<=
+gte		>=
+```
+
+####使用
+```
+<if value="$a gt 2">
+</if>
+```
+
+##foreach 标签 
+foreach标签与 PHP 中的 foreach 使用方法一致
+```
+语法
+<foreach from='变量' key='键名' value='键值'>
+	内容 
+</foreach>
+```
+
+####基本使用
+```
+<foreach from='$user' key='$key' value='$value'>
+ {{strtoupper($value)}} 
+</foreach>
+```
+
+####多重嵌套
+```
+<foreach from='$user' key='$key' value='$value'>
+	<foreach from='$value' key='$n'value='$m'>
+		{{$m}}
+	</foreach>
+</foreach>
+```
+
+##list 标签
+####语法
+```
+<list from='变量' name='值' row='显示行数' empty='为空时显示内容'>
+	内容 
+</list>
+```
+
+####基本使用
+```
+<list from='$data' name='$d' row='10' start='0' empty='没有数据'>
+	{{$d['cname']}}
+</list>
+```
+
+####间隔读取
+表示每次间隔 2 条数据输出
+```
+<list from='$row' name='$n' step='2'>
+	{{$n['title']}}
+</list>
+```
+
+####起始记录
+从第 2 条数据开始显示
+```
+<list from='$row' name='$n' start='2'>
+	{{$n.title}}
+</list>
+```
+
+####高级使用
+```
+<list from='$data' name='$n'>
+    <if value="$hd['list']['n']['first']">
+        {{$hd['list']['n']['index']}}: 这是第一条数据<br/>
+    <elseif value="$hd['list']['n']['last']"/>
+        {{$hd['list']['n']['index']}}: 最后一条记录<br/>
+    <else/>
+        {{$hd['list']['n']['index']}}:{{$n['title']}}<br/>
+	</if>
+</list>
+{{$hd['list']['n']['total']}} 	部记录数 
+{{$hd['list']['n']['first']}} 	是否为第 1 条记录 
+{{$hd['list']['n']['last']}} 		是否为最后一条记录 
+{{$hd['list']['n']['total']}} 	总记录数 
+{{$hd['list']['n']['index']}} 	当前循环是第几条 
+```
+
+##if 标签 
+```
+<if value="$webname eq 'houdunwang'">
+	后盾网 
+</if>
+```
+
+##else 标签
+```
+<if value='$webname == "houdunwang"'>
+    后盾网 
+<elseif value='$webname == "baidu"'/>
+    百度 
+<else/>
+	其他网站 
+</if>
+```
+
+##include导入模板
+```
+<include file="header"/>
+```
+
+可以在include标签中使用任意的路径常量
+```
+<include file="header"/>
+```
+
+导入指定的具体文件
+```
+<include file="template/index.html"/>
+```
+
+##php标签
+用于生成php代码
+```
+<php>if(true){</php>
+后盾网
+<php>}</php>
+```
+
+##引入CSS文件
+可以在标签中使用系统提供的url常量
+```
+<css file="css/common.css"/>
+```
+
+##引入JavaScript文件
+可以在标签中使用系统提供的url常量
+```
+<js file="view/css/common.js/>
+```
+
+
+#扩展标签
+
+框架提供了方便快速的标签定义，大大减少代码量，实现快速网站开发。 设置自定义标签简单、快速，下面我们来学习掌握框架自定义标签的使用方法。 
+
+[TOC]
+
+##文件
+####设置配置
+在配置项 tags 添加标签类即可。
+```
+'tags'=> ['system\tag\Common']
+```
+
+##创建
+标签代码可以放在任何目录中，只需要配置项中正确指定类即可。
+####代码
+```
+<?php namespace system/tag;
+use hdphp\view\TagBase;
+class Common extends TagBase{
+    //标签声明
+    public $tags = [
+    	//block说明 1：块标签  0：行标签
+        'test' => ['block' => 1, 'level' => 4]
+    ];
+    /**
+     * 测试标签
+     * @param $attr 标签属性集合
+     * @param $content 标签嵌套内容，块标签才有值
+     * @param $view 视图服务对象
+     */
+    public function _test($attr, $content, &$view){
+        return '33';
+    }
+}
+```
+
+####说明
+1. 块标签设置level 用于定义系统解析标签嵌套层数
+2. 行标签不需要设置level
+
+#缓存模板
+缓存可以增加网站加载速度，减少数据库服务器的压力，结合路由操作可以实例与全站静态化相同的效果，并且操作更加便捷。
+
+[TOC]
+##创建
+生成缓存文件，第二个参数为缓存时间，0(默认)为不缓存
+```
+View::make('article',100);
+//将article缓存100秒
+```
+
+##验证
+验证当缓存是否有效
+```
+View::isCache('article');
+```
+
+##删除
+删除缓存必须在 make 与 isCache 等方法前执行
+```
+View::delCache('article');
+```
+
+#模板继承
+##介绍
+模板继承类似于PHP中的类继承，有两个角色一个是“布局模板”用于定义相应的blade（区块)，然后是继承“布局模板”的“视图模板”，视图模板 定义块内容替换 布局模板 中相应的blade区域。
+
+[TOC]
+####特点
+* 布局模板用于定义区块
+* 视图模板用于定义替换布局模板的内容
+* 布局模板可以被多个 视图模板 继承
+
+####开关
+修改配置 blade 可关闭模板继承功能，即所有模板标签全部失效
+
+##使用
+####布局模板(父模板)
+模板文件master.php
+```
+<html>
+<head>
+    <title>Blade 页面布局</title>
+</head>
+<body>
+<blade name="content"/>
+<widget name="header">
+头部内容(这是要被子页面调用的) {{title}}
+</widget>
+<widget name="header">
+	底部内容
+</widget>
+</body>
+</html>
+```
+
+####视图模板(子模板)
+```
+<extend file='master'/>
+<block name="content">
+	<parent name="header" title="这是标题">
+  这是主体内容  
+	<parent name="footer">
+</block>
+```
+####说明
+* extend用于继承 布局模板（父级)，必须放在 parent/block 等标签前面调用
+* 使用block标签定义视图内容，block替换“父级模板"中相同name属性的blade标签
+* parent标签用于将父级模板 widget标签内容显示到此处
+* parent标签支持向父级传递内容如上例中的title，父级中使用{{title}}方式调用
