@@ -116,6 +116,14 @@ class Base {
 		return $this;
 	}
 
+	/**
+	 * 获取所有分配变量
+	 * @return array
+	 */
+	public function vars() {
+		return $this->vars;
+	}
+
 	//获取模板文件
 	public function getTpl() {
 		return $this->template( $this->file );

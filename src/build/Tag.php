@@ -9,6 +9,8 @@
  * '-------------------------------------------------------------------*/
 namespace houdunwang\view\build;
 
+use houdunwang\view\View;
+
 class Tag extends TagBase {
 
 	//blockshow模板(父级)
@@ -133,7 +135,9 @@ php;
 	public function _extend( $attr, $content, &$view ) {
 		//开启blade模板功能
 		if ( $this->facade->config( 'blade' ) ) {
-			return $view->make( $this->replaceConst( $attr['file'] ) );
+			$obj = new View();
+
+			return $obj->make( $this->replaceConst( $attr['file'] ) )->with( $view->vars() );
 		}
 	}
 
