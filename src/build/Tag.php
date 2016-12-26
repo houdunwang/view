@@ -12,7 +12,7 @@ namespace houdunwang\view\build;
 class Tag extends TagBase {
 
 	//blockshow模板(父级)
-	private static $widget = [ ];
+	protected $widget = [ ];
 	/**
 	 * block 块标签
 	 * level 嵌套层次
@@ -132,10 +132,8 @@ php;
 	//块布局时引入布局页的bladeshow块
 	public function _extend( $attr, $content, &$view ) {
 		//开启blade模板功能
-		if ( c( 'view.blade' ) ) {
-			$obj = new View;
-
-			return $obj->make( $this->replaceConst( $attr['file'] ) );
+		if ( $this->facade->config( 'blade' ) ) {
+			return $view->make( $this->replaceConst( $attr['file'] ) );
 		}
 	}
 
@@ -151,20 +149,19 @@ php;
 		} else {
 			return $content;
 		}
-
 	}
 
 	//布局模板定义用于显示在视图模板的内容(父级)
 	public function _widget( $attr, $content, &$view ) {
 		if ( $this->facade->config( 'blade' ) ) {
-			self::$widget[ $attr['name'] ] = $content;
+			$this->widget[ $attr['name'] ] = $content;
 		}
 	}
 
 	//视图模板引用布局模板(子级)
 	public function _parent( $attr, $content, &$view ) {
 		if ( $this->facade->config( 'blade' ) ) {
-			$content = self::$widget[ $attr['name'] ];
+			$content = $this->widget[ $attr['name'] ];
 			foreach ( $attr as $k => $v ) {
 				$content = str_replace( '{{' . $k . '}}', $v, $content );
 			}
