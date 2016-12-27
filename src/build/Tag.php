@@ -37,11 +37,6 @@ class Tag extends TagBase {
 			'php'     => [ 'block' => true, 'level' => 5 ],
 		];
 
-	//加载模板文件
-	public function _include( $attr, $content, &$view ) {
-		return file_get_contents( $view->compile( $attr['file'] ) );
-	}
-
 	//引入CSS文件
 	public function _css( $attr, $content, &$view ) {
 		$attr['file'] = $this->replaceConst( $attr['file'] );
@@ -131,13 +126,16 @@ php;
 		return "<?php $content;?>";
 	}
 
+	//加载模板文件
+	public function _include( $attr, $content, &$view ) {
+		return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $view->vars() );
+	}
+
 	//块布局时引入布局页的bladeshow块
 	public function _extend( $attr, $content, &$view ) {
 		//开启blade模板功能
 		if ( $this->facade->config( 'blade' ) ) {
-			$obj = new View();
-
-			return $obj->make( $this->replaceConst( $attr['file'] ) )->with( $view->vars() );
+			return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $view->vars() );
 		}
 	}
 
