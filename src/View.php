@@ -26,6 +26,7 @@ class View {
 	public function config( $config, $value = null ) {
 		if ( is_array( $config ) ) {
 			$this->config = $config;
+
 			return $this;
 		} else if ( is_null( $value ) ) {
 			return Arr::get( $this->config, $config );
@@ -52,12 +53,16 @@ class View {
 		}
 	}
 
-	public static function __callStatic( $name, $arguments ) {
+	public static function single() {
 		static $link = null;
 		if ( is_null( $link ) ) {
 			$link = new static();
 		}
 
-		return call_user_func_array( [ $link, $name ], $arguments );
+		return $link;
+	}
+
+	public static function __callStatic( $name, $arguments ) {
+		return call_user_func_array( [ static::single(), $name ], $arguments );
 	}
 }

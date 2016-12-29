@@ -9,9 +9,9 @@
  * '-------------------------------------------------------------------*/
 namespace houdunwang\view;
 
-use hdphp\kernel\ServiceFacade;
+use houdunwang\framework\build\Facade;
 
-class ViewFacade extends ServiceFacade {
+class ViewFacade extends Facade {
 	public static function getFacadeAccessor() {
 		return 'View';
 	}
