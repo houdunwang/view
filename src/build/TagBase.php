@@ -29,12 +29,10 @@ abstract class TagBase {
 	 *
 	 * @param $content 模板内容
 	 * @param $view 视图对象
-	 * @param $facade 外观类
 	 */
-	public function __construct( $content, $view, $facade ) {
+	public function __construct( $content, $view ) {
 		$this->content = $content;
 		$this->view    = $view;
-		$this->facade  = $facade;
 	}
 
 	/**
@@ -42,8 +40,8 @@ abstract class TagBase {
 	 * @return 模板内容
 	 */
 	public function parse() {
-		$this->left  = $this->facade->config( 'tag_left' );
-		$this->right = $this->facade->config( 'tag_right' );
+		$this->left  = $this->view->config( 'tag_left' );
+		$this->right = $this->view->config( 'tag_right' );
 		//解析标签
 		foreach ( $this->tags as $tag => $param ) {
 			if ( $param['block'] ) {

@@ -14,7 +14,8 @@ use houdunwang\view\View;
 class Tag extends TagBase {
 
 	//blockshow模板(父级)
-	protected $widget = [ ];
+	protected static $widget = [ ];
+
 	/**
 	 * block 块标签
 	 * level 嵌套层次
@@ -34,7 +35,7 @@ class Tag extends TagBase {
 			'parent'  => [ 'block' => false ],
 			'block'   => [ 'block' => true, 'level' => 5 ],
 			'widget'  => [ 'block' => true, 'level' => 5 ],
-			'php'     => [ 'block' => true, 'level' => 5 ],
+			'php'     => [ 'block' => true, 'level' => 5 ]
 		];
 
 	//引入CSS文件
@@ -45,14 +46,14 @@ class Tag extends TagBase {
 	}
 
 	//引入JavaScript文件
-	public function _js( $attr, $content, &$hd ) {
+	public function _js( $attr ) {
 		$attr['file'] = $this->replaceConst( $attr['file'] );
 
 		return "<script type=\"text/javascript\" src=\"{$attr['file']}\"></script>";
 	}
 
 	//list标签
-	public function _list( $attr, $content, &$view ) {
+	public function _list( $attr, $content ) {
 		$from  = $attr['from']; //变量
 		$name  = $attr['name'];//name名去除$
 		$empty = isset( $attr['empty'] ) ? $attr['empty'] : '';//默认值
@@ -102,7 +103,7 @@ php;
 	}
 
 	//if标签
-	public function _if( $attr, $content, &$hd ) {
+	public function _if( $attr, $content ) {
 		$php
 			= "<?php if({$attr['value']}){?>
                 $content
@@ -112,58 +113,58 @@ php;
 	}
 
 	//elseif标签
-	public function _elseif( $attr, $content, &$view ) {
+	public function _elseif( $attr ) {
 		return "<?php }else if({$attr['value']}){?>";
 	}
 
 	//else标签
-	public function _else( $attr, $content, &$view ) {
+	public function _else() {
 		return "<?php }else{?>";
 	}
 
 	//php标签
-	public function _php( $attr, $content, &$view ) {
+	public function _php( $attr, $content ) {
 		return "<?php $content;?>";
 	}
 
 	//加载模板文件
-	public function _include( $attr, $content, &$view ) {
-		return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $view->vars() );
+	public function _include( $attr ) {
+		return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $this->view->vars() );
 	}
 
 	//块布局时引入布局页的bladeshow块
-	public function _extend( $attr, $content, &$view ) {
+	public function _extend( $attr ) {
 		//开启blade模板功能
-		if ( $this->facade->config( 'blade' ) ) {
-			return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $view->vars() );
+		if ( $this->view->config( 'blade' ) ) {
+			return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $this->view->vars() );
 		}
 	}
 
 	//布局模板定义的块(父级)
-	public function _blade( $attr, $content, &$view ) {
+	public function _blade( $attr ) {
 		return "<!--blade_{$attr['name']}-->";
 	}
 
 	//视图模板定义的内容(子级)
-	public function _block( $attr, $content, &$view ) {
-		if ( $this->facade->config( 'blade' ) ) {
+	public function _block( $attr, $content ) {
+		if ( $this->view->config( 'blade' ) ) {
 			$this->content = str_replace( "<!--blade_{$attr['name']}-->", $content, $this->content );
 		} else {
 			return $content;
 		}
 	}
 
-	//布局模板定义用于显示在视图模板的内容(父级)
-	public function _widget( $attr, $content, &$view ) {
-		if ( $this->facade->config( 'blade' ) ) {
-			$this->widget[ $attr['name'] ] = $content;
+	//布局模板定义用于显示在视图模板的内容(父模板)
+	public function _widget( $attr, $content ) {
+		if ( $this->view->config( 'blade' ) ) {
+			self::$widget[ $attr['name'] ] = $content;
 		}
 	}
 
-	//视图模板引用布局模板(子级)
-	public function _parent( $attr, $content, &$view ) {
-		if ( $this->facade->config( 'blade' ) ) {
-			$content = $this->widget[ $attr['name'] ];
+	//视图模板引用布局模板(子模板)
+	public function _parent( $attr ) {
+		if ( $this->view->config( 'blade' ) ) {
+			$content = self::$widget[ $attr['name'] ];
 			foreach ( $attr as $k => $v ) {
 				$content = str_replace( '{{' . $k . '}}', $v, $content );
 			}

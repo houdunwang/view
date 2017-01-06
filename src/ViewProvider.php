@@ -9,34 +9,19 @@
  * '-------------------------------------------------------------------*/
 namespace houdunwang\view;
 
-
 use houdunwang\framework\build\Provider;
 
 class ViewProvider extends Provider {
 
 	//延迟加载
-	public $defer = false;
+	public $defer = true;
 
 	public function boot() {
-		print_const();
-//		if ( defined( 'MODULE' ) ) {
-//			//模块视图文件夹
-//			$file = c( 'app.path' ) . '/' . strtolower( MODULE . '/view/' . CONTROLLER ) . '/' . ( $file ?: ACTION . c( 'view.prefix' ) );
-//			if ( ! is_file( $file ) ) {
-//				trigger_error( "模板不存在:$file", E_USER_ERROR );
-//			}
-//		} else {
-//			//路由访问时
-//			$file = Config::get( 'view.path' ) . '/' . $file;
-//			if ( ! is_file( $file ) ) {
-//				trigger_error( "模板不存在:$file", E_USER_ERROR );
-//			}
-//		}
 	}
 
 	public function register() {
 		$this->app->single( 'View', function (  ) {
-			return new View();
+			return View::single();
 		} );
 	}
 }

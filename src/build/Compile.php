@@ -1,58 +1,41 @@
-<?php
-/** .-------------------------------------------------------------------
- * |  Software: [HDCMS framework]
- * |      Site: www.hdcms.com
- * |-------------------------------------------------------------------
- * |    Author: 向军 <2300071698@qq.com>
- * |    WeChat: aihoudun
- * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
- * '-------------------------------------------------------------------*/
-namespace houdunwang\view\build;
-use houdunwang\config\Config;
-
+<?php namespace houdunwang\view\build;
 /**
  * 模板编译
  * Class Compile
- * @package hdphp\view
- * @author 向军
+ * @package houdunwang\view\build
  */
-class Compile {
-	//视图对象
-	protected $view;
+trait Compile {
 	//模板编译内容
 	protected $content;
-	//外观类
-	protected $facade;
-
-	//构造函数
-	function __construct( $view, $facade ) {
-		$this->view   = $view;
-		$this->facade = $facade;
-	}
 
 	/**
-	 * 运行编译
-	 *
-	 * @param $tpl
+	 * 根据模板文件生成编译文件
 	 *
 	 * @return string
 	 */
-	public function run( $tpl ) {
-		//模板内容
-		$this->content = file_get_contents( $tpl );
-		//解析标签
-		$this->tags();
-		//解析全局变量与常量
-		$this->globalParse();
+	final protected function compile() {
+		$compileFile = $this->config( 'compile_dir' ) . '/' . preg_replace( '/[^\w]/', '_', $this->file ) . '_' . substr( md5( $this->file ), 0, 5 ) . '.php';
+		$status      = $this->config( 'compile_open' )
+		               || ! is_file( $compileFile )
+		               || ( filemtime( $this->file ) > filemtime( $compileFile ) );
+		if ( $status ) {
+			is_dir( dirname( $compileFile ) ) or mkdir( dirname( $compileFile ), 0755, true );
+			//模板内容
+			$this->content = file_get_contents( $this->file );
+			//解析标签
+			$this->tags();
+			//解析全局变量与常量
+			$this->globalParse();
+			file_put_contents( $compileFile, $this->content );
+		}
 
-		//保存编译文件
-		return $this->content;
+		return $compileFile;
 	}
 
 	/**
 	 * 解析全局变量与常量
 	 */
-	private function globalParse() {
+	final protected function globalParse() {
 		//处理{{}}
 		$this->content = preg_replace( '/(?<!@)\{\{(.*?)\}\}/i', '<?php echo \1?>', $this->content );
 		//处理@{{}}
@@ -62,13 +45,13 @@ class Compile {
 	/**
 	 * 解析标签
 	 */
-	private function tags() {
+	final protected function tags() {
 		//标签库
-		$tags   = $this->facade->config( 'tags' );
+		$tags   = $this->config( 'tags' );
 		$tags[] = 'houdunwang\view\build\Tag';
 		//解析标签
 		foreach ( $tags as $class ) {
-			$obj           = new $class( $this->content, $this->view, $this->facade );
+			$obj           = new $class( $this->content, $this );
 			$this->content = $obj->parse();
 		}
 	}

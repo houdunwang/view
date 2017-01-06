@@ -15,31 +15,12 @@ use houdunwang\view\build\Base;
 
 class View {
 	//连接
-	protected $link = null;
-	protected $config;
-
-	public function __construct() {
-		$this->config( Config::get( 'view' ) );
-	}
-
-	//设置配置项
-	public function config( $config, $value = null ) {
-		if ( is_array( $config ) ) {
-			$this->config = $config;
-
-			return $this;
-		} else if ( is_null( $value ) ) {
-			return Arr::get( $this->config, $config );
-		} else {
-			$this->config = Arr::set( $this->config, $config, $value );
-
-			return $this;
-		}
-	}
+	protected $link;
 
 	//更改缓存驱动
 	protected function driver() {
-		$this->link = new Base( $this );
+		$this->link = new Base();
+		$this->link->config( Config::get( 'view' ) );
 
 		return $this;
 	}
