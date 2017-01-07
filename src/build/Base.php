@@ -1,4 +1,5 @@
 <?php namespace houdunwang\view\build;
+
 /** .-------------------------------------------------------------------
  * |  Software: [HDCMS framework]
  * |      Site: www.hdcms.com
@@ -25,8 +26,10 @@ class Base {
 	protected $config;
 
 	//设置配置项
-	public function config( $config, $value = null ) {
-		if ( is_array( $config ) ) {
+	public function config( $config = null, $value = null ) {
+		if ( is_null( $config ) ) {
+			return $this->config;
+		} else if ( is_array( $config ) ) {
 			$this->config = $config;
 
 			return $this;
