@@ -14,7 +14,7 @@ use houdunwang\config\Config;
 class Base {
 	use Compile;
 	//模板变量集合
-	protected $vars = [ ];
+	protected static $vars = [ ];
 	//模版文件
 	protected $file;
 	//缓存目录
@@ -59,7 +59,7 @@ class Base {
 		$this->file  = $this->template( $file );
 		$compileFile = $this->compile();
 		ob_start();
-		extract( $this->vars );
+		extract( self::$vars );
 		include $compileFile;
 
 		return ob_get_clean();
@@ -91,10 +91,10 @@ class Base {
 	public function with( $name, $value = '' ) {
 		if ( is_array( $name ) ) {
 			foreach ( $name as $k => $v ) {
-				$this->vars[ $k ] = $v;
+				self::$vars[ $k ] = $v;
 			}
 		} else {
-			$this->vars[ $name ] = $value;
+			self::$vars[ $name ] = $value;
 		}
 
 		return $this;
@@ -105,7 +105,7 @@ class Base {
 	 * @return array
 	 */
 	public function vars() {
-		return $this->vars;
+		return self::$vars;
 	}
 
 	//获取模板文件

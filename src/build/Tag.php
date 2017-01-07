@@ -129,14 +129,14 @@ php;
 
 	//加载模板文件
 	public function _include( $attr ) {
-		return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $this->view->vars() );
+		return ( new View() )->make( $this->replaceConst( $attr['file'] ) );
 	}
 
 	//块布局时引入布局页的bladeshow块
 	public function _extend( $attr ) {
 		//开启blade模板功能
 		if ( $this->view->config( 'blade' ) ) {
-			return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->with( $this->view->vars() );
+			return ( new View() )->make( $this->replaceConst( $attr['file'] ) );
 		}
 	}
 
