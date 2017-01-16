@@ -14,15 +14,14 @@ abstract class TagBase {
 	protected $view;
 	protected $left;
 	protected $right;
-	protected $exp
-		= [
-			'/\s+eq\s+/'  => '==',
-			'/\s+neq\s+/' => '!=',
-			'/\s+gt\s+/'  => '>',
-			'/\s+lt\s+/'  => '<',
-			'/\s+lte\s+/' => '<=',
-			'/\s+gte\s+/' => '>='
-		];
+	protected $exp = [
+		'/\s+eq\s+/'  => '==',
+		'/\s+neq\s+/' => '!=',
+		'/\s+gt\s+/'  => '>',
+		'/\s+lt\s+/'  => '<',
+		'/\s+lte\s+/' => '<=',
+		'/\s+gte\s+/' => '>='
+	];
 
 	/**
 	 * TagBase constructor.
