@@ -91,12 +91,12 @@ php;
 	//标签处理
 	public function _foreach( $attr, $content ) {
 		if ( isset( $attr['key'] ) ) {
-			$php = "<?php foreach ({$attr['from']} as {$attr['key']}=>{$attr['value']}){?>";
+			$php = "<?php if(!empty({$attr['from']})){foreach ({$attr['from']} as {$attr['key']}=>{$attr['value']}){?>";
 		} else {
-			$php = "<?php foreach ({$attr['from']} as {$attr['value']}){?>";
+			$php = "<?php if(!empty({$attr['from']})){foreach ({$attr['from']} as {$attr['value']}){?>";
 		}
 		$php .= $content;
-		$php .= '<?php }?>';
+		$php .= '<?php }}?>';
 
 		return $php;
 	}
