@@ -24,6 +24,7 @@ class Tag extends TagBase {
 		'foreach' => [ 'block' => true, 'level' => 5 ],
 		'list'    => [ 'block' => true, 'level' => 5 ],
 		'if'      => [ 'block' => true, 'level' => 5 ],
+		'form'    => [ 'block' => true, 'level' => 5 ],
 		'elseif'  => [ 'block' => false ],
 		'else'    => [ 'block' => false ],
 		'js'      => [ 'block' => false ],
@@ -49,6 +50,15 @@ class Tag extends TagBase {
 		$attr['file'] = $this->replaceConst( $attr['file'] );
 
 		return "<script type=\"text/javascript\" src=\"{$attr['file']}\"></script>";
+	}
+
+	//为表单添加令牌
+	public function _form( $attr, $content ) {
+		$html = '<form ';
+		foreach ( $attr as $k => $v ) {
+			$html .= $k . '="' . $v . '" ';
+		}
+		echo $html . '>' . PHP_EOL . csrf_field() . $content . "</form>";
 	}
 
 	//list标签
@@ -91,9 +101,9 @@ php;
 	//标签处理
 	public function _foreach( $attr, $content ) {
 		if ( isset( $attr['key'] ) ) {
-			$php = "<?php if(!empty({$attr['from']})){foreach ({$attr['from']} as {$attr['key']}=>{$attr['value']}){?>";
+			$php = "<?php if(is_array({$attr['from']}) || is_object({$attr['from']})){foreach ({$attr['from']} as {$attr['key']}=>{$attr['value']}){?>";
 		} else {
-			$php = "<?php if(!empty({$attr['from']})){foreach ({$attr['from']} as {$attr['value']}){?>";
+			$php = "<?php if(is_array({$attr['from']}) || is_object({$attr['from']})){foreach ({$attr['from']} as {$attr['value']}){?>";
 		}
 		$php .= $content;
 		$php .= '<?php }}?>';
