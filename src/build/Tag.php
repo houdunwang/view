@@ -58,7 +58,7 @@ class Tag extends TagBase {
 		foreach ( $attr as $k => $v ) {
 			$html .= $k . '="' . $v . '" ';
 		}
-		echo $html . '>' . PHP_EOL . csrf_field() . $content . "</form>";
+		return $html . '>' . PHP_EOL . csrf_field() . $content . "</form>";
 	}
 
 	//list标签
