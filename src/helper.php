@@ -4,6 +4,6 @@
  */
 if ( ! function_exists( 'view' ) ) {
 	function view( $tpl = '', $expire = 0 ) {
-		return View::make( $tpl, $expire );
+		echo  View::make( $tpl, $expire );
 	}
 }
