@@ -24,7 +24,7 @@ class Tag extends TagBase {
 		'foreach' => [ 'block' => true, 'level' => 5 ],
 		'list'    => [ 'block' => true, 'level' => 5 ],
 		'if'      => [ 'block' => true, 'level' => 5 ],
-		'form'    => [ 'block' => true, 'level' => 5 ],
+		'form'    => [ 'block' => true, 'level' => 1 ],
 		'elseif'  => [ 'block' => false ],
 		'else'    => [ 'block' => false ],
 		'js'      => [ 'block' => false ],
