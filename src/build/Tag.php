@@ -58,6 +58,7 @@ class Tag extends TagBase {
 		foreach ( $attr as $k => $v ) {
 			$html .= $k . '="' . $v . '" ';
 		}
+
 		return $html . '>' . PHP_EOL . csrf_field() . $content . "</form>";
 	}
 
