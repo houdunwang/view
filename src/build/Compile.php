@@ -14,7 +14,8 @@ trait Compile {
 	 * @return string
 	 */
 	final protected function compile() {
-		$compileFile = $this->config( 'compile_dir' ) . '/' . preg_replace( '/[^\w]/', '_', $this->file ) . '_' . substr( md5( $this->file ), 0, 5 ) . '.php';
+		$compileFile = $this->config( 'compile_dir' ) . '/' . preg_replace( '/[^\w]/', '_', $this->file )
+		               . '_' . substr( md5( $this->file ), 0, 5 ) . '.php';
 		$status      = $this->config( 'compile_open' )
 		               || ! is_file( $compileFile )
 		               || ( filemtime( $this->file ) > filemtime( $compileFile ) );
