@@ -17,6 +17,21 @@ if ( ! function_exists( 'widget' ) ) {
 		//类名
 		$className = array_pop( $info );
 		$class     = implode( '\\', $info ) . '\\' . ucfirst( $className );
+
 		return call_user_func_array( [ new $class, $method ], $vars );
+	}
+}
+
+if ( ! function_exists( 'truncate' ) ) {
+	/**
+	 * 截取文字内容
+	 *
+	 * @param string $content 内容
+	 * @param string $len 长度
+	 *
+	 * @return string
+	 */
+	function truncate( $content, $len ) {
+		return mb_substr( $content, 0, $len, 'utf8' );
 	}
 }
