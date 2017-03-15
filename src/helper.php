@@ -4,7 +4,7 @@
  */
 if ( ! function_exists( 'view' ) ) {
 	function view( $tpl = '', $expire = 0 ) {
-		return View::make( $tpl, $expire );
+		return \houdunwang\view\View::make( $tpl, $expire );
 	}
 }
 if ( ! function_exists( 'widget' ) ) {
@@ -27,11 +27,11 @@ if ( ! function_exists( 'truncate' ) ) {
 	 * 截取文字内容
 	 *
 	 * @param string $content 内容
-	 * @param string $len 长度
+	 * @param int $len 长度
 	 *
 	 * @return string
 	 */
-	function truncate( $content, $len ) {
+	function truncate( $content, $len = 30 ) {
 		return mb_substr( $content, 0, $len, 'utf8' );
 	}
 }

@@ -9,8 +9,6 @@
  * '-------------------------------------------------------------------*/
 namespace houdunwang\view;
 
-use houdunwang\arr\Arr;
-use houdunwang\config\Config;
 use houdunwang\view\build\Base;
 
 class View {
@@ -20,7 +18,6 @@ class View {
 	//更改缓存驱动
 	protected function driver() {
 		$this->link = new Base();
-		$this->link->config( Config::get( 'view' ) );
 
 		return $this;
 	}

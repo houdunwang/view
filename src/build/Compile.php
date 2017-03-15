@@ -1,4 +1,6 @@
 <?php namespace houdunwang\view\build;
+use houdunwang\config\Config;
+
 /**
  * 模板编译
  * Class Compile
@@ -14,10 +16,10 @@ trait Compile {
 	 * @return string
 	 */
 	final protected function compile() {
-		$compileFile = $this->config( 'compile_dir' ) . '/' . preg_replace( '/[^\w]/', '_', $this->file )
+		$compileFile = Config::get( 'view.compile_dir' ) . '/' . preg_replace( '/[^\w]/', '_', $this->file )
 		               . '_' . substr( md5( $this->file ), 0, 5 ) . '.php';
-		$status      = $this->config( 'compile_open' )
-		               || ! is_file( $compileFile )
+		//能否生成编译文件
+		$status      = Config::get( 'view.compile_open' ) || ! is_file( $compileFile )
 		               || ( filemtime( $this->file ) > filemtime( $compileFile ) );
 		if ( $status ) {
 			is_dir( dirname( $compileFile ) ) or mkdir( dirname( $compileFile ), 0755, true );
@@ -48,7 +50,7 @@ trait Compile {
 	 */
 	final protected function tags() {
 		//标签库
-		$tags   = $this->config( 'tags' );
+		$tags   = Config::get( 'view.tags' );
 		$tags[] = 'houdunwang\view\build\Tag';
 		//解析标签
 		foreach ( $tags as $class ) {
