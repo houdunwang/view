@@ -15,7 +15,7 @@ use houdunwang\config\Config;
 class Base {
 	use Compile;
 	//模板变量集合
-	protected static $vars = [ ];
+	protected static $vars = [];
 	//模版文件
 	protected $file;
 	//缓存目录
@@ -27,18 +27,27 @@ class Base {
 	 * 解析模板
 	 *
 	 * @param string $file 模板文件
-	 * @param int $expire 缓存时间
+	 * @param mixed $vars 分配的变量
 	 *
 	 * @return $this
 	 */
-	public function make( $file = '', $expire = 0 ) {
-		$this->file   = $this->template( $file );
-		$this->expire = intval( $expire );
+	public function make( $file = '', $vars = [] ) {
+		if ( ! empty( $vars ) ) {
+			$this->with( $vars );
+		}
+		$this->file = $this->template( $file );
 
 		return $this;
 	}
 
-	//解析编译文件,返回模板解析后的字符
+	/**
+	 * 解析编译文件
+	 * 返回模板解析后的字符
+	 *
+	 * @param $file 文件名
+	 *
+	 * @return string
+	 */
 	public function fetch( $file ) {
 		$this->file  = $this->template( $file );
 		$compileFile = $this->compile();
@@ -49,11 +58,13 @@ class Base {
 		return ob_get_clean();
 	}
 
-	//显示模板
+	/*
+	 * 显示模板
+	 */
 	public function __toString() {
 		if ( $this->expire > 0 && $this->isCache( $this->file ) ) {
 			//缓存有效时返回缓存数据
-			return Cache::driver( 'file' )->dir(Config::get( 'view.cache_dir' ))->get( $this->cacheName( $this->file ) );
+			return Cache::driver( 'file' )->dir( Config::get( 'view.cache_dir' ) )->get( $this->cacheName( $this->file ) );
 		}
 		$content = $this->fetch( $this->file );
 		//创建缓存文件
@@ -75,10 +86,10 @@ class Base {
 	public function with( $name, $value = '' ) {
 		if ( is_array( $name ) ) {
 			foreach ( $name as $k => $v ) {
-				self::$vars= Arr::set(self::$vars,$k,$v);
+				self::$vars = Arr::set( self::$vars, $k, $v );
 			}
 		} else {
-			self::$vars = Arr::set(self::$vars,$name,$value);
+			self::$vars = Arr::set( self::$vars, $name, $value );
 		}
 
 		return $this;
@@ -97,7 +108,13 @@ class Base {
 		return $this->file;
 	}
 
-	//根据文件名获取模板文件
+	/**
+	 * 根据文件名获取模板文件
+	 *
+	 * @param string $file 模板文件
+	 *
+	 * @return string 模板文件名
+	 */
 	protected function template( $file ) {
 		//没有扩展名时添加上
 		if ( $file && ! preg_match( '/\.[a-z]+$/i', $file ) ) {
@@ -122,6 +139,19 @@ class Base {
 		}
 
 		return $file;
+	}
+
+	/**
+	 * 设置缓存时间
+	 *
+	 * @param int $expire 缓存时间
+	 *
+	 * @return $this
+	 */
+	public function cache( $expire ) {
+		$this->expire = $expire;
+
+		return $this;
 	}
 
 	//缓存标识

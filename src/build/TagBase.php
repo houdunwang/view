@@ -120,7 +120,7 @@ abstract class TagBase {
 	 */
 	private function getAttr( $con ) {
 		$attr = [ ];
-		$preg = '#([\w\-]+)\s*=\s*([\'"])(.*?)\2#i';
+		$preg = '#([^\=\s]+)\s*=\s*([\'"])(.*?)\2#i';
 		if ( preg_match_all( $preg, $con, $matches ) ) {
 			foreach ( $matches[1] as $i => $name ) {
 				//$attr[$name] = $this->ReplaceConst($matches[3][$i]);

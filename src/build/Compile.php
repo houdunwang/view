@@ -1,4 +1,5 @@
 <?php namespace houdunwang\view\build;
+
 use houdunwang\config\Config;
 
 /**
@@ -19,8 +20,8 @@ trait Compile {
 		$compileFile = Config::get( 'view.compile_dir' ) . '/' . preg_replace( '/[^\w]/', '_', $this->file )
 		               . '_' . substr( md5( $this->file ), 0, 5 ) . '.php';
 		//能否生成编译文件
-		$status      = Config::get( 'view.compile_open' ) || ! is_file( $compileFile )
-		               || ( filemtime( $this->file ) > filemtime( $compileFile ) );
+		$status = Config::get( 'view.compile_open' ) || ! is_file( $compileFile )
+		          || ( filemtime( $this->file ) > filemtime( $compileFile ) );
 		if ( $status ) {
 			is_dir( dirname( $compileFile ) ) or mkdir( dirname( $compileFile ), 0755, true );
 			//模板内容
@@ -29,6 +30,8 @@ trait Compile {
 			$this->tags();
 			//解析全局变量与常量
 			$this->globalParse();
+			//添加csrf令牌
+			$this->csrf();
 			file_put_contents( $compileFile, $this->content );
 		}
 
@@ -56,6 +59,15 @@ trait Compile {
 		foreach ( $tags as $class ) {
 			$obj           = new $class( $this->content, $this );
 			$this->content = $obj->parse();
+		}
+	}
+
+	/**
+	 * 添加表单令牌
+	 */
+	final protected function csrf() {
+		if ( Config::get( 'csrf.open' ) ) {
+			$this->content = preg_replace( '#(<form.*>)#', '$1' . PHP_EOL . csrf_field(), $this->content );
 		}
 	}
 }

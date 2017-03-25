@@ -8,13 +8,14 @@
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
 namespace houdunwang\view\build;
+
 use houdunwang\config\Config;
 use houdunwang\view\View;
 
 class Tag extends TagBase {
 
 	//blockshow模板(父级)
-	protected static $widget = [ ];
+	protected static $widget = [];
 
 	/**
 	 * block 块标签
@@ -24,7 +25,6 @@ class Tag extends TagBase {
 		'foreach' => [ 'block' => true, 'level' => 5 ],
 		'list'    => [ 'block' => true, 'level' => 5 ],
 		'if'      => [ 'block' => true, 'level' => 5 ],
-		'form'    => [ 'block' => true, 'level' => 1 ],
 		'elseif'  => [ 'block' => false ],
 		'else'    => [ 'block' => false ],
 		'js'      => [ 'block' => false ],
@@ -50,16 +50,6 @@ class Tag extends TagBase {
 		$attr['file'] = $this->replaceConst( $attr['file'] );
 
 		return "<script type=\"text/javascript\" src=\"{$attr['file']}\"></script>";
-	}
-
-	//为表单添加令牌
-	public function _form( $attr, $content ) {
-		$html = '<form ';
-		foreach ( $attr as $k => $v ) {
-			$html .= $k . '="' . $v . '" ';
-		}
-
-		return $html . '>' . PHP_EOL . csrf_field() . $content . "</form>";
 	}
 
 	//list标签
