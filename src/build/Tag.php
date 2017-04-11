@@ -7,6 +7,7 @@
  * |    WeChat: aihoudun
  * | Copyright (c) 2012-2019, www.houdunwang.com. All Rights Reserved.
  * '-------------------------------------------------------------------*/
+
 namespace houdunwang\view\build;
 
 use houdunwang\config\Config;
@@ -80,9 +81,9 @@ class Tag extends TagBase {
 				\$hd['list'][\$_name]['last']  = \$id>=$row || !isset(\$_tmp[\$key]);
             ?>
 php;
-		$php .= $content;
+		$php   .= $content;
 		$php
-			.= "<?php 
+		       .= "<?php 
 					if(\$hd['list'][\$_name]['last']){break;}
 				}}?>";
 
@@ -129,14 +130,14 @@ php;
 
 	//加载模板文件
 	public function _include( $attr ) {
-		return ( new View() )->make( $this->replaceConst( $attr['file'] ) );
+		return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->compile()->getCompileContent();
 	}
 
 	//块布局时引入布局页的bladeshow块
 	public function _extend( $attr ) {
 		//开启blade模板功能
 		if ( Config::get( 'view.blade' ) ) {
-			return ( new View() )->make( $this->replaceConst( $attr['file'] ) );
+			return ( new View() )->make( $this->replaceConst( $attr['file'] ) )->compile()->getCompileContent();
 		}
 	}
 

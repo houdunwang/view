@@ -49,19 +49,23 @@ class Base {
 	 * @return string
 	 */
 	public function fetch( $file ) {
-		$this->file  = $this->template( $file );
-		$compileFile = $this->compile();
+		$this->file = $this->template( $file );
+		$this->compile();
 		ob_start();
 		extract( self::$vars );
-		include $compileFile;
+		include $this->compileFile;
 
 		return ob_get_clean();
+	}
+
+	public function __toString() {
+		return $this->toString();
 	}
 
 	/*
 	 * 显示模板
 	 */
-	public function __toString() {
+	public function toString() {
 		if ( $this->expire > 0 && $this->isCache( $this->file ) ) {
 			//缓存有效时返回缓存数据
 			return Cache::driver( 'file' )->dir( Config::get( 'view.cache_dir' ) )->get( $this->cacheName( $this->file ) );

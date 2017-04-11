@@ -10,20 +10,39 @@ use houdunwang\config\Config;
 trait Compile {
 	//模板编译内容
 	protected $content;
+	//编译文件
+	protected $compileFile;
+
+	//设置编译文件
+	final public function setCompileFile() {
+		$this->compileFile = Config::get( 'view.compile_dir' )
+		                     . '/' . preg_replace( '/[^\w]/', '_', $this->file )
+		                     . '_' . substr( md5( $this->file ), 0, 5 ) . '.php';
+
+		return $this->compileFile;
+	}
 
 	/**
-	 * 根据模板文件生成编译文件
-	 *
-	 * @return string
+	 * 获取编译内容
+	 * @return bool|string
 	 */
-	final protected function compile() {
-		$compileFile = Config::get( 'view.compile_dir' ) . '/' . preg_replace( '/[^\w]/', '_', $this->file )
-		               . '_' . substr( md5( $this->file ), 0, 5 ) . '.php';
+	final public function getCompileContent() {
+		return file_get_contents( $this->compileFile );
+	}
+
+	/**
+	 * 创建编译文件
+	 * @return $this
+	 */
+	final public function compile() {
+		$this->setCompileFile();
 		//能否生成编译文件
-		$status = Config::get( 'view.compile_open' ) || ! is_file( $compileFile )
-		          || ( filemtime( $this->file ) > filemtime( $compileFile ) );
+		$status = Config::get( 'app.debug' )
+		          || Config::get( 'view.compile_open' )
+		          || ! is_file( $this->compileFile )
+		          || ( filemtime( $this->file ) > filemtime( $this->compileFile ) );
 		if ( $status ) {
-			is_dir( dirname( $compileFile ) ) or mkdir( dirname( $compileFile ), 0755, true );
+			is_dir( dirname( $this->compileFile ) ) or mkdir( dirname( $this->compileFile ), 0755, true );
 			//模板内容
 			$this->content = file_get_contents( $this->file );
 			//解析标签
@@ -32,10 +51,10 @@ trait Compile {
 			$this->globalParse();
 			//添加csrf令牌
 			$this->csrf();
-			file_put_contents( $compileFile, $this->content );
+			file_put_contents( $this->compileFile, $this->content );
 		}
 
-		return $compileFile;
+		return $this;
 	}
 
 	/**
