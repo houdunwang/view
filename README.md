@@ -15,83 +15,186 @@ composer require houdunwang/view
 ```
 > HDPHP 框架已经内置此组件，无需要安装
 
-####配置缓存
-组件使用了 [Cache组件](https://github.com/houdunwang/cache) 需要先行进行配置。
+####配置
 
 ```
-$config = [
-	'file'     => [
-	    //缓存目录
-		'dir' => 'storage/cache'
-	]
+$config =  [
+    /*
+    |--------------------------------------------------------------------------
+    | 开启调试模式
+    |--------------------------------------------------------------------------
+    */
+    'debug'       => true,
+    /*
+    |--------------------------------------------------------------------------
+    | 模板目录
+    |--------------------------------------------------------------------------
+    | 只参路由模式有效
+    | 控制器访问时无效
+    */
+    'path'        => 'view',
+
+    /*
+    |--------------------------------------------------------------------------
+    | 模板文件默认扩展名
+    |--------------------------------------------------------------------------
+    | 当使用模板时没有添加扩展名将使用下面定义的扩展名
+    */
+    'prefix'      => '.php',
+
+    /*
+    |--------------------------------------------------------------------------
+    | 扩展标签
+    |--------------------------------------------------------------------------
+    | 用于定义扩展的模板标签
+    */
+    'tags'        => [
+        \tests\app\Common::class
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | 左边界符
+    |--------------------------------------------------------------------------
+    | 用于定义模板标签的左边界符
+    */
+    'tag_left'    => '<',
+
+    /*
+    |--------------------------------------------------------------------------
+    | 右边界符
+    |--------------------------------------------------------------------------
+    | 用于定义模板标签的右边界符
+    */
+    'tag_right'   => '>',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Blade模板标签开关
+    |--------------------------------------------------------------------------
+    | 当设置为FALSE时,模板引擎的blade(父子级包含)功能将失效
+    */
+    'blade'       => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | 缓存目录
+    |--------------------------------------------------------------------------
+    | 框架支持缓存模板文件用于减少服务器压力
+    | 下面的配置项是定义缓存文件的存放目录
+    */
+    'cache_dir'   => 'tests/storage/view/cache',
+
+    /*
+    |--------------------------------------------------------------------------
+    | 编译目录
+    |--------------------------------------------------------------------------
+    | 模板引擎支持一次编译生成PHP代码这样可以提供系统运行性能
+    | 下面的配置项是定义编译文件的保存目录
+    */
+    'compile_dir' => 'tests/storage/view/compile',
 ];
-\houdunwang\config\Config::set( 'cache', $config );
+\houdunwang\config\Config::batch($config);
 ```
 
-####配置视图组件
+#模板文件
+模板就是视图界面，模板会在路由与控制器中使用到，如果在路由回调函数中使用，因为没有模块所以与在控制器中使用还是有些不同的。
+
+[TOC]
+
+###语法
 ```
-$config = [
-	//模板目录（只对路由调用有效）
-	'path'         => 'view',
-	//模板后缀
-	'prefix'       => '.php',
-	//标签
-	'tags'         => [ ],
-	//左标签
-	'tag_left'     => '<',
-	//右标签
-	'tag_right'    => '>',
-	//blade 模板功能开关
-	'blade'        => true,
-	//缓存目录
-	'cache_dir'    => 'storage/view/cache',
-	//编译目录
-	'compile_dir'  => 'storage/view/compile',
-	//开启编译
-	'compile_open' => false,
-];
-\houdunwang\config\Config::set( 'view', $config );
+View::make($tpl,$vars=[]);
+参数               	说明
+$tpl				   模版文件
+$vars				分配的变量
 ```
 
-##解析模板
-模板就是视图界面,模板文件没有设置扩展名时将使用配置项 prefix 的值。
+##使用
+系统调用配置文件的策略如下：
+1. 模板文件存在时直接读取 如: View::make('index.php')
+2. 控制器中使用：模块/view/控制器/模板文件
+3. 路由中使用：到"view.php"配置文件设置的目录中查找
+4. 文件没有扩展名时以配置项 prefix 添加后缀
+
+####控制器中使用
+不设置模板时使用当前请求方法做为文件名
+```
+return View::make();
+//没有参数时使用当前方法名称做为模板文件名
+```
 
 不添加后缀时使用配置项 prefix 设置的后缀。
 ```
-View::make('add');
+return  View::make('add');
+//添加路径时分2种情况：
+//1: 从网站根目录查找即："add.php"
+//2: 从模块的View目录查找:"模块/view/add.php"
 ```
 
+####路由器中使用
+```
+Route::get('/',function(){
+	return View::make('index');
+});
+```
+上面的代码会到"view.php"配置文件设置的目录中查找 index.php
+
 ##分配数据
+
+[TOC]
+
+####分配变量
+```
+View::with('uri','houdunwang.com');
+//模板中读取方式：{{$uri}}
+```
+
 ####以数组形式分配
 ```
 View::with(['name'=>'后盾网','uri'=>'houdunwang.com']);
 //模板中读取方式：{{$name}}
 ```
+####在make时分配
+View::make('index.html',['name'=>'后盾人']);
+
+####点语法分配变量
+```
+View::with('module.name','后盾人');
+//或
+View::with(['module.name'=>'后盾人']);
+//模板中使用以下方式读取
+{{$module['name']}}
+```
 
 ####分配变量并显示模板
 ```
-View::with(['name'=>'后盾网','uri'=>'houdunwang.com'])->make();
+return  View::with(['name'=>'后盾网','uri'=>'houdunwang.com'])->make();
 ```
 
-##读取变量
+####获取分配的变量
+vars() 方法用于获取使用 with()方法分配的所有变量
+```
+View::getVars();
+```
+
+##模板使用
 通过View::with分配的变量在模板中使用{{变量名}}形式读取
 
+####读取变量
 ```
-{{$_GET['cid']}}          					读取 $_GET 中的值  
-{{$_POST['cid']}}                 		读取 $_POST 中的值  
-{{$_REQUEST['cid']}}               		读取 $_REQUEST 中的值
-{{$_SESSION['cid']}}              		读取 $_SESSION 中的值  
-{{$_COOKIE['cid']}}               		读取 $_COOKIE 中的值
-{{$_SERVER['HTTP_HOST']}}         		读取 $_SERVER 中的值 
-{{Config::get('database.user')}} 			读取配置项值  
+{{$name}}          					
 ```
-> 提示：在{{}}中可以使用任意php函数
+####读取配置项值
+```
+{{Config::get('database.user')}}  
+```
+> 提示：在{{ }}中可以使用任意php函数
 
 ####忽略解析
 ```
 @{{$name}}
 ```
-
 
 #系统标签
 模板标签是使用预先定义好的tag快速读取数据。开发者也可以根据项目需要扩展标签库。
@@ -199,9 +302,9 @@ foreach标签与 PHP 中的 foreach 使用方法一致
 ##else 标签
 ```
 <if value='$webname == "houdunwang"'>
-    后盾网 
+	后盾网 
 <elseif value='$webname == "baidu"'/>
-    百度 
+	 百度 
 <else/>
 	其他网站 
 </if>
@@ -214,7 +317,7 @@ foreach标签与 PHP 中的 foreach 使用方法一致
 
 可以在include标签中使用任意的路径常量
 ```
-<include file="header"/>
+<include file="VIEW_PATH/header"/>
 ```
 
 导入指定的具体文件
@@ -233,15 +336,14 @@ foreach标签与 PHP 中的 foreach 使用方法一致
 ##引入CSS文件
 可以在标签中使用系统提供的url常量
 ```
-<css file="css/common.css"/>
+<css file="__VIEW__/css/common.css"/>
 ```
 
 ##引入JavaScript文件
 可以在标签中使用系统提供的url常量
 ```
-<js file="view/css/common.js/>
+<js file="__ROOT__/view/css/common.js/>
 ```
-
 
 #扩展标签
 
@@ -250,17 +352,24 @@ foreach标签与 PHP 中的 foreach 使用方法一致
 [TOC]
 
 ##文件
-####设置配置
-在配置项 tags 添加标签类即可。
+####创建文件
+使用命令行创建标签类。
 ```
-'tags'=> ['system\tag\Common']
+php hd make:tag Common
+//系统将在 system/tag 目录中生成标签文件
+```
+
+####设置配置
+修改config/view.php文件设置如下字段
+```
+'tags'=> [system\tag\Common::class]
 ```
 
 ##创建
 标签代码可以放在任何目录中，只需要配置项中正确指定类即可。
 ####代码
 ```
-<?php namespace system/tag;
+namespace system/tag;
 use hdphp\view\TagBase;
 class Common extends TagBase{
     //标签声明
@@ -284,14 +393,16 @@ class Common extends TagBase{
 1. 块标签设置level 用于定义系统解析标签嵌套层数
 2. 行标签不需要设置level
 
+
 #缓存模板
 缓存可以增加网站加载速度，减少数据库服务器的压力，结合路由操作可以实例与全站静态化相同的效果，并且操作更加便捷。
 
 [TOC]
+
 ##创建
 生成缓存文件，第二个参数为缓存时间，0(默认)为不缓存
 ```
-View::make('article',100);
+return View::cache(100)->make('article');
 //将article缓存100秒
 ```
 
@@ -309,7 +420,7 @@ View::delCache('article');
 
 #模板继承
 ##介绍
-模板继承类似于PHP中的类继承，有两个角色一个是“布局模板”用于定义相应的blade（区块)，然后是继承“布局模板”的“视图模板”，视图模板 定义块内容替换 布局模板 中相应的blade区域。
+模板继承类似于PHP中的类继承，有两个角色一个是“布局模板(父模板)”用于定义相应的blade（区块)，然后是继承“布局模板”的“视图模板”，视图模板定义块内容替换布局模板中相应的blade区域。
 
 [TOC]
 ####特点
@@ -317,30 +428,28 @@ View::delCache('article');
 * 视图模板用于定义替换布局模板的内容
 * 布局模板可以被多个 视图模板 继承
 
-####开关
-修改配置 blade 可关闭模板继承功能，即所有模板标签全部失效
-
 ##使用
 ####布局模板(父模板)
-模板文件master.php
+布局模板是被子模板调用的，不需要在控制器或路由中读取。比如下面的模板文件 master.php ，子模板要调用时可以使用 <extend file='master'/> 继承这个父模板。
 ```
 <html>
 <head>
-    <title>Blade 页面布局</title>
+	<title>Blade 页面布局(父模板)</title>
 </head>
 <body>
 <blade name="content"/>
 <widget name="header">
-头部内容(这是要被子页面调用的) {{title}}
+	头部内容(父页面 widget标签内容) {{$title}}
 </widget>
-<widget name="header">
-	底部内容
+<widget name="footer">
+	底部内容(父页面 widget标签内容)
 </widget>
 </body>
 </html>
 ```
 
 ####视图模板(子模板)
+视图模板指我们在控制器或路由中使用 View::make() 或 view() 函数显示的模板。
 ```
 <extend file='master'/>
 <block name="content">
@@ -350,7 +459,42 @@ View::delCache('article');
 </block>
 ```
 ####说明
-* extend用于继承 布局模板（父级)，必须放在 parent/block 等标签前面调用
+* extend用于继承 布局模板（父级)，必须放在 parent、block 等标签前面调用
 * 使用block标签定义视图内容，block替换“父级模板"中相同name属性的blade标签
 * parent标签用于将父级模板 widget标签内容显示到此处
 * parent标签支持向父级传递内容如上例中的title，父级中使用{{title}}方式调用
+
+#视图函数
+
+[TOC]
+##view
+view函数是View::make()的函数调用方式，就是解析模板使用的。
+
+##widget组件函数
+大家不要将 widget 函数与 模板标签中的 widget标签混淆，虽然都在在视图模板中使用，但功能略有不同。
+
+widget函数用于在视图中调用类方法，类方法可以使用View::make()等组件或任何动作只要返回的字符串都会在调用 widget方法的模板位置显示，大家通过下面实例来加深印象。
+
+####类文件定义
+```
+namespace app;
+class Widget {
+	public function show($a,$b){
+		return 'hello hdphp!'.$b;
+	}
+}
+```
+
+####模板中调用
+```
+{{widget('app.widget.show',99,'hdphp')}}
+```
+widget方法的第一个参数为调用的类方法，以后的参数都是类方法的参数。
+上例中将在模板中显示 ‘hello hdphp! hdphp'
+
+
+##truncate截取内容
+```
+{{truncate('后盾人 人人做后盾',3)}}
+//结果为：后盾人
+```
