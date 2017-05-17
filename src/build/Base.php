@@ -33,12 +33,12 @@ class Base
      *
      * @return $this
      */
-    public function make($file, $vars = [])
+    public function make($file='', $vars = [])
     {
-        Middleware::web('view_parse_file');
         $this->setFile($file);
         $this->with($vars);
         $this->setPath(Config::get('view.path'));
+        Middleware::web('view_parse_file');
 
         return $this;
     }
@@ -69,8 +69,7 @@ class Base
                 $file = $path.'/'.$file;
                 if (is_file($file)) {
                     $this->file = $file;
-
-                    return;
+                    return ;
                 }
             }
         }
