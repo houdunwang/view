@@ -11,6 +11,7 @@
 
 use houdunwang\arr\Arr;
 use houdunwang\config\Config;
+use houdunwang\middleware\Middleware;
 
 class Base
 {
@@ -34,10 +35,11 @@ class Base
      */
     public function make($file, $vars = [])
     {
+        Middleware::web('view_parse_file');
         $this->setFile($file);
         $this->with($vars);
         $this->setPath(Config::get('view.path'));
-        
+
         return $this;
     }
 
@@ -62,18 +64,16 @@ class Base
         if ($file && ! preg_match('/\.[a-z]+$/i', $file)) {
             $file .= Config::get('view.prefix');
         }
-        if ( ! is_file($file)) {
+        if (strstr($file, '/') == false || ! is_file($file)) {
             foreach ($this->path as $path) {
                 $file = $path.'/'.$file;
                 if (is_file($file)) {
-                    break;
+                    $this->file = $file;
+
+                    return;
                 }
             }
         }
-        if ( ! is_file($file)) {
-            throw new \Exception("模板文件 {$file} 不存在");
-        }
-        $this->file = $file;
     }
 
     /**
