@@ -143,15 +143,16 @@ php;
     //加载模板文件
     public function _include($attr)
     {
-        return (new View())->make($attr['file'])->compile()
-            ->getCompileContent();
+        $file = $this->replaceConst($attr['file']);
+        return (new View())->make($file)->compile()->getCompileContent();
     }
 
     //块布局时引入布局页的bladeshow块
     public function _extend($attr)
     {
-        return (new View())->make($attr['file'])
-            ->compile()->getCompileContent();
+        $file = $this->replaceConst($attr['file']);
+
+        return (new View())->make($file)->compile()->getCompileContent();
     }
 
     //布局模板定义的块(父级)
@@ -163,32 +164,23 @@ php;
     //视图模板定义的内容(子级)
     public function _block($attr, $content)
     {
-        if (Config::get('view.blade')) {
-            $this->content = str_replace("<!--blade_{$attr['name']}-->",
-                $content, $this->content);
-        } else {
-            return $content;
-        }
+        $this->content = str_replace("<!--blade_{$attr['name']}-->", $content, $this->content);
     }
 
     //布局模板定义用于显示在视图模板的内容(父模板)
     public function _widget($attr, $content)
     {
-        if (Config::get('view.blade')) {
-            self::$widget[$attr['name']] = $content;
-        }
+        self::$widget[$attr['name']] = $content;
     }
 
     //视图模板引用布局模板(子模板)
     public function _parent($attr)
     {
-        if (Config::get('view.blade')) {
-            $content = self::$widget[$attr['name']];
-            foreach ($attr as $k => $v) {
-                $content = str_replace('{{'.$k.'}}', $v, $content);
-            }
-
-            return $content;
+        $content = self::$widget[$attr['name']];
+        foreach ($attr as $k => $v) {
+            $content = str_replace('{{'.$k.'}}', $v, $content);
         }
+
+        return $content;
     }
 }

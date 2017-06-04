@@ -23,7 +23,7 @@ class Base
     //缓存时间
     protected $expire;
     //模板目录
-    protected $path = [];
+    protected $path;
 
     /**
      * 解析模板
@@ -33,11 +33,10 @@ class Base
      *
      * @return $this
      */
-    public function make($file='', $vars = [])
+    public function make($file = '', $vars = [])
     {
         $this->setFile($file);
         $this->with($vars);
-        $this->setPath(Config::get('view.path'));
         Middleware::web('view_parse_file');
 
         return $this;
@@ -48,7 +47,15 @@ class Base
      */
     public function setPath($path)
     {
-        $this->path[] = $path;
+        $this->path = $path;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
 
     /**
@@ -56,7 +63,7 @@ class Base
      *
      * @param $file 模板文件
      *
-     * @throws \Exception
+     * @return string|void
      */
     public function setFile($file)
     {
@@ -64,13 +71,13 @@ class Base
         if ($file && ! preg_match('/\.[a-z]+$/i', $file)) {
             $file .= Config::get('view.prefix');
         }
-        if (strstr($file, '/') == false || ! is_file($file)) {
-            foreach ($this->path as $path) {
-                $file = $path.'/'.$file;
-                if (is_file($file)) {
-                    $this->file = $file;
-                    return ;
-                }
+
+        if (strstr($file, '/') && is_file($file)) {
+            $this->file = $file;
+        } else {
+            $file = $this->path.'/'.$file;
+            if (is_file($file)) {
+                $this->file = $file;
             }
         }
     }
@@ -136,7 +143,10 @@ class Base
      */
     public function fetch($file)
     {
-        $this->getFile($file);
+        $this->setFile($file);
+        if ( ! is_file($this->getFile())) {
+            trigger_error('模板文件不存在', E_USER_ERROR);
+        }
         $this->compile();
         ob_start();
         extract(self::getVars());
@@ -165,8 +175,8 @@ class Base
         if ($this->expire > 0 && $this->isCache($this->file)) {
             //缓存有效时返回缓存数据
             return Cache::driver('file')
-                ->dir(Config::get('view.cache_dir'))
-                ->get($this->cacheName($this->file));
+                        ->dir(Config::get('view.cache_dir'))
+                        ->get($this->cacheName($this->file));
         }
         $content = $this->fetch($this->file);
         //创建缓存文件

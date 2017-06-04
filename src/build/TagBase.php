@@ -73,7 +73,7 @@ abstract class TagBase
     {
         for ($i = 1; $i <= $param['level']; $i++) {
             $preg = '#'.$this->left.'(?:'.$tag.'|'.$tag.'\s+(.*?))'.$this->right
-                .'(.*?)'.$this->left.'/'.$tag.$this->right.'#is';
+                    .'(.*?)'.$this->left.'/'.$tag.$this->right.'#is';
             if (preg_match_all($preg, $this->content, $matchs,
                 PREG_SET_ORDER)) {
                 foreach ($matchs as $m) {
@@ -104,7 +104,7 @@ abstract class TagBase
     private function line($tag)
     {
         $preg = '#'.$this->left.'(?:'.$tag.'|'.$tag.'\s+(.*?))\s*/?'
-            .$this->right.'#is';
+                .$this->right.'#is';
         if (preg_match_all($preg, $this->content, $matchs, PREG_SET_ORDER)) {
             foreach ($matchs as $m) {
                 //获取属性

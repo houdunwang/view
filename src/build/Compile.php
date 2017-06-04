@@ -19,8 +19,8 @@ trait Compile
     final public function setCompileFile()
     {
         $this->compileFile = Config::get('view.compile_dir')
-            .'/'.preg_replace('/[^\w]/', '_', $this->file)
-            .'_'.substr(md5($this->file), 0, 5).'.php';
+                             .'/'.preg_replace('/[^\w]/', '_', $this->file)
+                             .'_'.substr(md5($this->file), 0, 5).'.php';
 
         return $this->compileFile;
     }
@@ -45,15 +45,12 @@ trait Compile
         $this->setCompileFile();
         //能否生成编译文件
         $status = Config::get('view.debug')
-            || Config::get('view.compile_open')
-            || ! is_file($this->compileFile)
-            || (filemtime($this->file) > filemtime($this->compileFile));
+                  || Config::get('view.compile_open')
+                  || ! is_file($this->compileFile)
+                  || (filemtime($this->file) > filemtime($this->compileFile));
         if ($status) {
-            is_dir(dirname($this->compileFile)) or mkdir(
-                dirname($this->compileFile),
-                0755,
-                true
-            );
+            is_dir(dirname($this->compileFile)) or mkdir(dirname($this->compileFile), 0755, true);
+
             //模板内容
             $this->content = file_get_contents($this->file);
             //解析标签
