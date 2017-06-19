@@ -23,11 +23,8 @@ class ViewProvider extends Provider
 
     public function register()
     {
-        $this->app->single(
-            'View',
-            function () {
-                return View::single();
-            }
-        );
+        $this->app->single('View', function () {
+            return View::single();
+        });
     }
 }

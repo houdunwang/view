@@ -16,14 +16,23 @@ use houdunwang\middleware\Middleware;
 class Base
 {
     use Compile, Cache;
+
     //模板变量集合
     protected static $vars = [];
+
     //模版文件
     protected $file;
-    //缓存时间
-    protected $expire;
+
     //模板目录
     protected $path;
+
+    //缓存目录
+    protected $cacheDir;
+
+    public function __construct()
+    {
+        $this->cacheDir = Config::get('view.cache_dir');
+    }
 
     /**
      * 解析模板
@@ -172,20 +181,13 @@ class Base
      */
     public function toString()
     {
-        if ($this->expire > 0 && $this->isCache($this->file)) {
-            //缓存有效时返回缓存数据
-            return Cache::driver('file')
-                        ->dir(Config::get('view.cache_dir'))
-                        ->get($this->cacheName($this->file));
+        if ($this->expire > 0 && ($cache = $this->getCache())) {
+            return $cache;
         }
         $content = $this->fetch($this->file);
         //创建缓存文件
         if ($this->expire > 0) {
-            Cache::driver('file')->dir(Config::get('view.cache_dir'))->set(
-                $this->cacheName($this->file),
-                $content,
-                $this->expire
-            );
+            $this->setCache($content);
         }
 
         return $content;

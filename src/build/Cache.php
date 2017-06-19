@@ -17,6 +17,21 @@ namespace houdunwang\view\build;
  */
 trait Cache
 {
+    //缓存时间
+    protected $expire;
+
+    /**
+     * 设置缓存时间
+     * @param int $expire 时间
+     *
+     * @return $this
+     */
+    public function setExpire($expire)
+    {
+        $this->expire = $expire;
+        return $this;
+    }
+
     /**
      * 设置缓存时间
      *
@@ -34,13 +49,11 @@ trait Cache
     /**
      * 缓存标识
      *
-     * @param $file
-     *
      * @return string
      */
-    protected function cacheName($file)
+    protected function cacheName()
     {
-        return md5($_SERVER['REQUEST_URI'].$this->template($file));
+        return md5($_SERVER['REQUEST_URI'].$this->template($this->file));
     }
 
     /**
@@ -52,10 +65,33 @@ trait Cache
      */
     public function isCache($file = '')
     {
-        return \houdunwang\cache\Cache::driver('file')
-            ->dir(Config::get('view.cache_dir'))->get(
-            $this->cacheName($file)
-        );
+        $dir = Config::get('view.cache_dir');
+
+        return \houdunwang\cache\Cache::driver('file')->dir($dir)->get($this->cacheName());
+    }
+
+    /**
+     * 获取模板缓存
+     *
+     * @return mixed
+     */
+    public function getCache()
+    {
+        $dir = Config::get('view.cache_dir');
+
+        return \houdunwang\cache\Cache::driver('file')->dir($dir)->get($this->cacheName());
+    }
+
+    /**
+     * 设置模板缓存
+     *
+     * @param $content
+     *
+     * @return mixed
+     */
+    public function setCache($content)
+    {
+        return Cache::driver('file')->dir($this->cacheDir)->set($this->cacheName(), $content, $this->expire);
     }
 
     /**
@@ -67,9 +103,7 @@ trait Cache
      */
     public function delCache($file = '')
     {
-        return \houdunwang\cache\Cache::driver('file')
-            ->dir(Config::get('view.cache_dir'))->del(
-            $this->cacheName($file)
-        );
+        return \houdunwang\cache\Cache::driver('file')->dir(Config::get('view.cache_dir'))
+                                      ->del($this->cacheName($file));
     }
 }
