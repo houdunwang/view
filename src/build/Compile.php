@@ -45,7 +45,6 @@ trait Compile
         $this->setCompileFile();
         //能否生成编译文件
         $status = Config::get('view.debug')
-                  || Config::get('view.compile_open')
                   || ! is_file($this->compileFile)
                   || (filemtime($this->file) > filemtime($this->compileFile));
         if ($status) {
