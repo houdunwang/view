@@ -26,12 +26,9 @@ class Base
     //模板目录
     protected $path;
 
-    //缓存目录
-    protected $cacheDir;
 
     public function __construct()
     {
-        $this->cacheDir = Config::get('view.cache_dir');
     }
 
     /**

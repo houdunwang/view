@@ -10,6 +10,8 @@
 
 namespace houdunwang\view\build;
 
+use houdunwang\config\Config;
+
 /**
  * Trait Cache
  *
@@ -22,6 +24,7 @@ trait Cache
 
     /**
      * 设置缓存时间
+     *
      * @param int $expire 时间
      *
      * @return $this
@@ -29,6 +32,7 @@ trait Cache
     public function setExpire($expire)
     {
         $this->expire = $expire;
+
         return $this;
     }
 
@@ -53,17 +57,15 @@ trait Cache
      */
     protected function cacheName()
     {
-        return md5($_SERVER['REQUEST_URI'].$this->template($this->file));
+        return md5($_SERVER['REQUEST_URI'].$this->getFile());
     }
 
     /**
      * 验证缓存文件
      *
-     * @param string $file
-     *
      * @return mixed
      */
-    public function isCache($file = '')
+    public function isCache()
     {
         $dir = Config::get('view.cache_dir');
 
@@ -78,7 +80,6 @@ trait Cache
     public function getCache()
     {
         $dir = Config::get('view.cache_dir');
-
         return \houdunwang\cache\Cache::driver('file')->dir($dir)->get($this->cacheName());
     }
 
@@ -91,7 +92,9 @@ trait Cache
      */
     public function setCache($content)
     {
-        return Cache::driver('file')->dir($this->cacheDir)->set($this->cacheName(), $content, $this->expire);
+        $dir = Config::get('view.cache_dir');
+
+        return \houdunwang\cache\Cache::driver('file')->dir($dir)->set($this->cacheName(), $content, $this->expire);
     }
 
     /**
@@ -103,7 +106,8 @@ trait Cache
      */
     public function delCache($file = '')
     {
-        return \houdunwang\cache\Cache::driver('file')->dir(Config::get('view.cache_dir'))
-                                      ->del($this->cacheName($file));
+        $dir = Config::get('view.cache_dir');
+
+        return \houdunwang\cache\Cache::driver('file')->dir($dir)->del($this->cacheName($file));
     }
 }
