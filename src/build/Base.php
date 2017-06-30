@@ -26,11 +26,6 @@ class Base
     //模板目录
     protected $path;
 
-
-    public function __construct()
-    {
-    }
-
     /**
      * 解析模板
      *
@@ -85,6 +80,9 @@ class Base
             if (is_file($file)) {
                 $this->file = $file;
             }
+        }
+        if ( ! is_file($this->file)) {
+            trigger_error('模板文件不存在:'.$file, E_USER_ERROR);
         }
     }
 
@@ -150,9 +148,17 @@ class Base
     public function fetch($file)
     {
         $this->setFile($file);
-        if ( ! is_file($this->getFile())) {
-            trigger_error('模板文件不存在', E_USER_ERROR);
-        }
+
+        return $this->parse();
+    }
+
+    /**
+     * 解析处理
+     *
+     * @return string
+     */
+    protected function parse()
+    {
         $this->compile();
         ob_start();
         extract(self::getVars());
@@ -181,7 +187,7 @@ class Base
         if ($this->expire > 0 && ($cache = $this->getCache())) {
             return $cache;
         }
-        $content = $this->fetch($this->file);
+        $content = $this->parse();
         //创建缓存文件
         if ($this->expire > 0) {
             $this->setCache($content);
