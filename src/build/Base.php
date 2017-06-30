@@ -81,9 +81,7 @@ class Base
                 $this->file = $file;
             }
         }
-        if ( ! is_file($this->file)) {
-            trigger_error('模板文件不存在:'.$file, E_USER_ERROR);
-        }
+
     }
 
     /**
@@ -159,6 +157,9 @@ class Base
      */
     protected function parse()
     {
+        if ( ! is_file($this->file)) {
+            trigger_error('模板文件不存在:'.$this->file, E_USER_ERROR);
+        }
         $this->compile();
         ob_start();
         extract(self::getVars());
