@@ -55,3 +55,53 @@ if ( ! function_exists('view_path')) {
         return \houdunwang\view\View::getPath();
     }
 }
+
+if ( ! function_exists('csrf_field')) {
+    /**
+     * CSRF 表单
+     *
+     * @return string
+     */
+    function csrf_field()
+    {
+        return "<input type='hidden' name='csrf_token' value='".Session::get('csrf_token')."'/>\r\n";
+    }
+}
+
+if ( ! function_exists('csrf_token')) {
+    /**
+     * CSRF 值
+     *
+     * @return mixed
+     */
+    function csrf_token()
+    {
+        return Session::get('csrf_token');
+    }
+}
+
+if ( ! function_exists('view_url')) {
+    /**
+     * 模板目录链接
+     *
+     * @return string
+     */
+    function view_url()
+    {
+        return __ROOT__.'/'.view_path();
+    }
+}
+
+if ( ! function_exists('method_field')) {
+    /**
+     * CSRF 表单
+     *
+     * @param $type
+     *
+     * @return string
+     */
+    function method_field($type)
+    {
+        return "<input type='hidden' name='_method' value='".strtoupper($type)."'/>\r\n";
+    }
+}

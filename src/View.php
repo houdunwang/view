@@ -20,39 +20,50 @@ use houdunwang\view\build\Base;
  */
 class View
 {
-    //连接
-    protected $link;
+    /**
+     * 连接驱动
+     *
+     * @var
+     */
+    protected static $link;
 
-    //更改缓存驱动
-    protected function driver()
-    {
-        $this->link = new Base();
-
-        return $this;
-    }
-
-    public function __call($method, $params)
-    {
-        if (is_null($this->link)) {
-            $this->driver();
-        }
-        if (method_exists($this->link, $method)) {
-            return call_user_func_array([$this->link, $method], $params);
-        }
-    }
-
+    /**
+     * 生成单例视图
+     *
+     * @return \houdunwang\view\build\Base
+     */
     public static function single()
     {
-        static $link = null;
-        if (is_null($link)) {
-            $link = new static();
+        if ( ! self::$link) {
+            self::$link = new Base();
         }
 
-        return $link;
+        return self::$link;
     }
 
+    /**
+     * 动态调用
+     *
+     * @param $method
+     * @param $params
+     *
+     * @return mixed
+     */
+    public function __call($method, $params)
+    {
+        return call_user_func_array([self::single(), $method], $params);
+    }
+
+    /**
+     * 静态调用
+     *
+     * @param $name
+     * @param $arguments
+     *
+     * @return mixed
+     */
     public static function __callStatic($name, $arguments)
     {
-        return call_user_func_array([static::single(), $name], $arguments);
+        return call_user_func_array([self::single(), $name], $arguments);
     }
 }

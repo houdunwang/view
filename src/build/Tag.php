@@ -10,7 +10,6 @@
 
 namespace houdunwang\view\build;
 
-use houdunwang\config\Config;
 use houdunwang\view\View;
 
 class Tag extends TagBase
@@ -144,7 +143,7 @@ php;
     public function _include($attr)
     {
         $file = $this->replaceConst($attr['file']);
-        return (new View())->make($file)->compile()->getCompileContent();
+        return (new Base())->make($file)->compile()->getCompileContent();
     }
 
     //块布局时引入布局页的bladeshow块
@@ -152,7 +151,7 @@ php;
     {
         $file = $this->replaceConst($attr['file']);
 
-        return (new View())->make($file)->compile()->getCompileContent();
+        return (new Base())->make($file)->compile()->getCompileContent();
     }
 
     //布局模板定义的块(父级)

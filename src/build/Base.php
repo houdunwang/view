@@ -27,6 +27,16 @@ class Base
     protected $path;
 
     /**
+     * 返回视图实例
+     *
+     * @return \houdunwang\view\build\Base
+     */
+    public function instance()
+    {
+        return new self();
+    }
+
+    /**
      * 解析模板
      *
      * @param string $file 模板文件

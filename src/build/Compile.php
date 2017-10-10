@@ -44,12 +44,10 @@ trait Compile
     {
         $this->setCompileFile();
         //能否生成编译文件
-        $status = Config::get('view.debug')
-                  || ! is_file($this->compileFile)
+        $status = Config::get('app.debug') || ! is_file($this->compileFile)
                   || (filemtime($this->file) > filemtime($this->compileFile));
         if ($status) {
             is_dir(dirname($this->compileFile)) or mkdir(dirname($this->compileFile), 0755, true);
-
             //模板内容
             $this->content = file_get_contents($this->file);
             //解析标签

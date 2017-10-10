@@ -10,15 +10,18 @@
 
 namespace houdunwang\view;
 
+use houdunwang\config\Config;
 use houdunwang\framework\build\Provider;
+use houdunwang\view\build\Csrf;
 
 class ViewProvider extends Provider
 {
     //延迟加载
-    public $defer = true;
+    public $defer = false;
 
     public function boot()
     {
+        View::setPath(Config::get('view.path'));
     }
 
     public function register()

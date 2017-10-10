@@ -115,7 +115,6 @@ abstract class TagBase
                 }
                 //执行标签方法
                 $method = '_'.$tag;
-
                 $replace = $this->$method($attr, '', $this->view);
                 //替换模板内容
                 $this->content = str_replace($m[0], $replace, $this->content);
