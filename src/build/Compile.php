@@ -44,8 +44,7 @@ trait Compile
     {
         $this->setCompileFile();
         //能否生成编译文件
-        $status = Config::get('app.debug') || ! is_file($this->compileFile)
-                  || (filemtime($this->file) > filemtime($this->compileFile));
+        $status = Config::get('app.debug') || ! is_file($this->compileFile) || (filemtime($this->file) > filemtime($this->compileFile));
         if ($status) {
             is_dir(dirname($this->compileFile)) or mkdir(dirname($this->compileFile), 0755, true);
             //模板内容
@@ -68,17 +67,9 @@ trait Compile
     final protected function globalParse()
     {
         //处理{{}}
-        $this->content = preg_replace(
-            '/(?<!@)\{\{(.*?)\}\}/i',
-            '<?php echo \1?>',
-            $this->content
-        );
+        $this->content = preg_replace('/(?<!@)\{\{(.*?)\}\}/i', '<?php echo \1?>', $this->content);
         //处理@{{}}
-        $this->content = preg_replace(
-            '/@(\{\{.*?\}\})/i',
-            '\1',
-            $this->content
-        );
+        $this->content = preg_replace('/@(\{\{.*?\}\})/i', '\1', $this->content);
     }
 
     /**
@@ -102,11 +93,7 @@ trait Compile
     final protected function csrf()
     {
         if (Config::get('csrf.open')) {
-            $this->content = preg_replace(
-                '#(<form.*>)#',
-                '$1'.PHP_EOL.csrf_field(),
-                $this->content
-            );
+            $this->content = preg_replace('#(<form.*>)#', '$1'.PHP_EOL.'<?php echo csrf_field();?>', $this->content);
         }
     }
 }
