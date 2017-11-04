@@ -12,6 +12,7 @@
 use houdunwang\arr\Arr;
 use houdunwang\config\Config;
 use houdunwang\middleware\Middleware;
+use houdunwang\request\Request;
 
 class Base
 {
@@ -51,6 +52,19 @@ class Base
         Middleware::web('view_parse_file');
 
         return $this;
+    }
+
+    /**
+     * 返回模板解析后的字符
+     *
+     * @param string $file
+     * @param array  $vars
+     *
+     * @return string
+     */
+    public function fetch($file = '', $vars = [])
+    {
+        return $this->make($file, $vars)->parse();
     }
 
     /**
@@ -146,21 +160,6 @@ class Base
     }
 
     /**
-     * 解析编译文件
-     * 返回模板解析后的字符
-     *
-     * @param $file 文件名
-     *
-     * @return string
-     */
-    public function fetch($file)
-    {
-        $this->setFile($file);
-
-        return $this->parse();
-    }
-
-    /**
      * 解析处理
      *
      * @return string
@@ -195,12 +194,13 @@ class Base
      */
     public function toString()
     {
-        if ($this->expire > 0 && ($cache = $this->getCache())) {
+        $open = Request::get('_cache', 1);
+        if ($open && ($this->expire > 0) && ($cache = $this->getCache())) {
             return $cache;
         }
         $content = $this->parse();
         //创建缓存文件
-        if ($this->expire > 0) {
+        if ($open && $this->expire > 0) {
             $this->setCache($content);
         }
 
