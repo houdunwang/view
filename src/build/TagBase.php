@@ -74,8 +74,7 @@ abstract class TagBase
         for ($i = 1; $i <= $param['level']; $i++) {
             $preg = '#'.$this->left.'(?:'.$tag.'|'.$tag.'\s+(.*?))'.$this->right
                     .'(.*?)'.$this->left.'/'.$tag.$this->right.'#is';
-            if (preg_match_all($preg, $this->content, $matchs,
-                PREG_SET_ORDER)) {
+            if (preg_match_all($preg, $this->content, $matchs, PREG_SET_ORDER)) {
                 foreach ($matchs as $m) {
                     //获取属性
                     if ( ! empty($m[1])) {
@@ -87,8 +86,7 @@ abstract class TagBase
                     $method  = '_'.$tag;
                     $replace = $this->$method($attr, $m[2], $this->view);
                     //替换模板内容
-                    $this->content = str_replace($m[0], $replace,
-                        $this->content);
+                    $this->content = str_replace($m[0], $replace, $this->content);
                 }
             } else {
                 return;
@@ -114,7 +112,7 @@ abstract class TagBase
                     $attr = [];
                 }
                 //执行标签方法
-                $method = '_'.$tag;
+                $method  = '_'.$tag;
                 $replace = $this->$method($attr, '', $this->view);
                 //替换模板内容
                 $this->content = str_replace($m[0], $replace, $this->content);
@@ -136,8 +134,7 @@ abstract class TagBase
         if (preg_match_all($preg, $con, $matches)) {
             foreach ($matches[1] as $i => $name) {
                 //替换eq neq 等
-                $attr[$name] = preg_replace(array_keys($this->exp),
-                    array_values($this->exp), $matches[3][$i]);
+                $attr[$name] = preg_replace(array_keys($this->exp), array_values($this->exp), $matches[3][$i]);
             }
         }
 

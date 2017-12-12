@@ -66,8 +66,10 @@ trait Compile
      */
     final protected function globalParse()
     {
-        //处理{{}}
-        $this->content = preg_replace('/(?<!@)\{\{(.*?)\}\}/i', '<?php echo \1?>', $this->content);
+        //处理{{!!!!}} 不转识体
+        $this->content = preg_replace('/(?<!@)\{!!(.*?)!!\}/i', '<?php echo \1?>', $this->content);
+        //处理{{}} 转识体
+        $this->content = preg_replace('/(?<!@)\{\{(.*?)\}\}/i', '<?php echo htmlspecialchars(\1)?>', $this->content);
         //处理@{{}}
         $this->content = preg_replace('/@(\{\{.*?\}\})/i', '\1', $this->content);
     }
