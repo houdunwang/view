@@ -91,6 +91,33 @@ if ( ! function_exists('view_url')) {
         return __ROOT__.'/'.view_path();
     }
 }
+if ( ! function_exists('widget_css')) {
+    /**
+     * 加载部件CSS文件
+     *
+     * @param $css
+     *
+     * @return string
+     */
+    function widget_css($css)
+    {
+        return "<style>".file_get_contents($css)."</style>";
+    }
+}
+
+if ( ! function_exists('widget_js')) {
+    /**
+     * 加载部件JS文件
+     *
+     * @param $js
+     *
+     * @return string
+     */
+    function widget_js($js)
+    {
+        return "<script>".file_get_contents(__DIR__."/js/{$js}.js")."</script>";
+    }
+}
 
 if ( ! function_exists('method_field')) {
     /**
